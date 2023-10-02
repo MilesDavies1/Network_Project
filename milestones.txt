@@ -1,0 +1,6 @@
+PDF) milestones.pdf: Presentation of the milestones (programs developed, topology fragment discovered)
+and the associated date/time. For each program developed, provide the finish date/time and the responsible
+team member(s). For each topology fragment discovered, show the screenshots of the program output, 
+draw the diagram of the topology fragment, and provide the name and Howard ID of the team member making
+the discovery. Each topology fragment can only be attributed to one team member
+
