@@ -1,5 +1,6 @@
 
 from scapy.all import *
+from tqdm import tqdm
 import threading
 import argparse
 import json
@@ -9,11 +10,12 @@ public_prefix = '138.238.'
 internal_prefix = '10.'
 
 class Topology(object):
-  def __init__(self, is_resume, reset_flag, is_public):
+  def __init__(self, is_resume, reset_flag, is_public, verbose):
     self.ips = set()
     self.links = set()
     self.flags = set()
 
+    self.verbose = verbose
     self.is_public = is_public
     self.prefix = public_prefix if is_public else internal_prefix
 
@@ -50,25 +52,33 @@ class Topology(object):
       if os.path.exists(self.bkup_link_path): os.remove(self.bkup_link_path)
       if os.path.exists(self.bkup_flag_path): os.remove(self.bkup_flag_path)
 
-    print()
-
   def add_ip(self, ip):
-    if not ip.startswith(self.prefix): return
+    if self.is_public:
+      if not ip.startswith(self.prefix) and not ip.startswith(internal_prefix): return
+    else:
+      if not ip.startswith(self.prefix): return
 
     if ip not in self.ips:
       self.ips.add(ip)
       self.backup_ip(ip)
 
-      print('***** added new ip: {} ({} ip\'s, {} links)'.format(ip, len(self.ips), len(self.links)))
+      if self.verbose: print('***** added new ip: {} ({} ip\'s, {} links)'.format(ip, len(self.ips), len(self.links)))
 
   def add_link(self, ip1, ip2):
-    if not ip1.startswith(self.prefix) or not ip2.startswith(self.prefix): return
+    if ip1 == ip2: return
+
+    if self.is_public:
+      if (not ip1.startswith(self.prefix) and not ip1.startswith(internal_prefix)) or \
+        (not ip2.startswith(self.prefix) and not ip2.startswith(internal_prefix)):
+          return
+    else:
+      if not ip1.startswith(self.prefix) or not ip2.startswith(self.prefix): return
 
     s_ip, e_ip = min(ip1, ip2), max(ip1, ip2)
 
     if (s_ip, e_ip) not in self.links:      
       self.links.add((s_ip, e_ip))
-      self.backup_link((s_ip, e_ip))
+      self.backup_link(s_ip, e_ip)
 
   def add_flag(self, ip):
     if not ip.startswith(self.prefix): return
@@ -76,7 +86,7 @@ class Topology(object):
     self.backup_flag(ip)
     self.flags.add(ip)
 
-    print('##### flagged new ip: {} ({} flags)'.format(ip, len(self.flags)))
+    if self.verbose: print('##### flagged new ip: {} ({} flags)'.format(ip, len(self.flags)))
 
   def backup_ip(self, ip):
     with self.lock_ip:
@@ -98,6 +108,7 @@ def tuplize(ip):
 
 def ping(ip):
   if ip in topology.flags: return
+  if ip in topology.ips: return
 
   r, _ = traceroute(ip, l4 = UDP(dport = 33434), verbose = 0)
   
@@ -119,20 +130,28 @@ def ping(ip):
 
   if not found: topology.add_flag(ip)
 
-def work(workload):
+def work(workload, prog_bar):
   for ip in workload:
     ping(ip)
+
+    if prog_bar is not None: prog_bar.update(1)
 
 def main(args):
   is_public = args.mode.lower() == 'public'
   global topology
 
-  topology = Topology(is_resume = args.resume, reset_flag = args.flag, is_public = is_public)
+  topology = Topology(is_resume = args.resume, reset_flag = args.flag, is_public = is_public, verbose = args.verbose)
   
   tasks = [[] for _ in range(args.thread)]
-  wid = 0
+  wid, count = 0, 0
 
-  for k in range(2 ** (16 if is_public else 24)):
+  z_0 = int(args.z.split(',')[0])
+  z_i = int(args.z.split(',')[1])
+
+  print('- please wait while preparing scan list.')
+  print()
+
+  for k in tqdm(range(2 ** (16 if is_public else 24)), desc = 'prepare', colour = 'green'):
     if is_public:
       x = k // 256
       y = k % 256
@@ -143,14 +162,25 @@ def main(args):
       y = (k - x * 65536) // 256
       z = (k - x * 65536) % 256
 
+      if z < 1 or z > 254: continue
+      if (z - z_0) % z_i != 0: continue
+
       ip = '{}{}.{}.{}'.format(internal_prefix, x, y, z)
 
-    if tuplize(ip) >= tuplize(args.start) and tuplize(ip) <= tuplize(args.end) and ip not in topology.flags:
+    if tuplize(ip) >= tuplize(args.start) and tuplize(ip) <= tuplize(args.end) and ip not in topology.flags and ip not in topology.ips:
       tasks[wid].append(ip)
       wid = (wid + 1) % args.thread
+      count += 1
+
+  print()
+  print('- total {} ip\'s to scan.'.format(count))
+  print()
+
+  prog_bar = None if args.verbose else tqdm(total = count, desc = 'overall', position = 0, colour = 'red')
 
   for i in range(args.thread):
-    t = threading.Thread(target = work, args = (tasks[i], ))
+    workload = tasks[i] if args.verbose else tqdm(tasks[i], desc = 'thread-{}'.format(i + 1), position = i + 1, colour = 'blue')
+    t = threading.Thread(target = work, args = (workload, prog_bar))
     t.start()
 
 if __name__ == '__main__':
@@ -161,9 +191,11 @@ if __name__ == '__main__':
   parser.add_argument('-t', '--thread', type = int, default = 8, help = 'number of threads')
   parser.add_argument('-r', '--resume', action = 'store_true', default = False, help = 'resume from backup file')
   parser.add_argument('-f', '--flag', action = 'store_true', default = False, help = 'reset flags')
+  parser.add_argument('-v', '--verbose', action = 'store_true', default = False, help = 'true if verbose without prog bar')
+  parser.add_argument('-z', '--z', type = str, default = '0,1', help = 'last segment setup')
   args = parser.parse_args()
 
-  if args.mode.lower() != 'public' and args.mode.lower() != 'internal':
+  if args.mode is None or (args.mode.lower() != 'public' and args.mode.lower() != 'internal'):
     print('argument `mode (-m)` invalid. must be `public` or `internal`.')
     exit(-1)
 
