@@ -16,7 +16,8 @@ def run_traceroute(target_ip):
     return hops
 
 if __name__ == "__main__":
-    target_ips = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]  # Example target IPs
+    target_ips = [f"10.0.0.{i}" for i in range(1, 255)]  # internal Campus routers
+    target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 16)]  # External public servers
     for target_ip in target_ips:
         result = run_traceroute(target_ip)
         print(f"Traceroute to {target_ip}: {result}")
