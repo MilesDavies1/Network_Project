@@ -6,7 +6,7 @@ def run_traceroute(target_ip):
     for ttl in range(1, 30):  # Set a suitable TTL range
         pkt = IP(dst=target_ip, ttl=ttl) / UDP(dport=33434)
         reply = sr1(pkt, verbose=0, timeout=1)
-        if reply is None:
+        if reply is None: # Breaking after no reply is undescriptive 
             break
         elif reply.type == 3:
             hops.append(reply.src)
@@ -16,8 +16,9 @@ def run_traceroute(target_ip):
     return hops
 
 if __name__ == "__main__":
-    target_ips = [f"10.0.0.{i}" for i in range(1, 255)]  # internal Campus routers
-    target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 16)]  # External public servers
+    target_ips = [f"10.0.0.{i}" for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
+    target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 33, 4)]  # External public servers
     for target_ip in target_ips:
         result = run_traceroute(target_ip)
         print(f"Traceroute to {target_ip}: {result}")
+
