@@ -1,12 +1,13 @@
 # traceroute_script.py
 from scapy.all import IP, UDP, sr1
+import pandas as pd
 
 def run_traceroute(target_ip):
     hops = []
     for ttl in range(1, 30):  # Set a suitable TTL range
         pkt = IP(dst=target_ip, ttl=ttl) / UDP(dport=33434)
         reply = sr1(pkt, verbose=0, timeout=1)
-        if reply is None: # Breaking after no reply is undescriptive 
+        if reply is None: # Note: Breaking after no reply is undescriptive 
             break
         elif reply.type == 3:
             hops.append(reply.src)
@@ -18,7 +19,13 @@ def run_traceroute(target_ip):
 if __name__ == "__main__":
     target_ips = [f"10.0.0.{i}" for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
     target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 33, 4)]  # External public servers
+
+    #create an empty dictionary to store traceroute info
+    traceroute_data = []
+
     for target_ip in target_ips:
         result = run_traceroute(target_ip)
+        traceroute_data.append({'Target IP': target_ip, 'Traceroute Result': result}) # adds tracerouts data to the dictionary
+        traceroute_df = pd.DataFrame(traceroute_data) # creates a pandas dataframe and adds the dictionary info
+        traceroute_df.to_excel('traceroute_results.xlsx', index=False)  # pushes the collected dataframe info to an excel document named traceroute_xlsx
         print(f"Traceroute to {target_ip}: {result}")
-
