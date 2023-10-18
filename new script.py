@@ -1,6 +1,7 @@
 # traceroute_script.py
 from scapy.all import IP, UDP, sr1
 import pandas as pd
+import os 
 
 def run_traceroute(target_ip):
     hops = []
@@ -8,7 +9,7 @@ def run_traceroute(target_ip):
         pkt = IP(dst=target_ip, ttl=ttl) / UDP(dport=33434)
         reply = sr1(pkt, verbose=0, timeout=1)
         if reply is None: # Note: Breaking after no reply is undescriptive 
-            break
+            break # changed it to pass, had no effect
         elif reply.type == 3:
             hops.append(reply.src)
             break
@@ -17,7 +18,7 @@ def run_traceroute(target_ip):
     return hops
 
 if __name__ == "__main__":
-    target_ips = [f"10.0.0.{i}" for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
+    target_ips = [f"10.{k+24}.{j}.{i}" for k in range(1, 255, 8) for j in range(1, 255, 8) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
     target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 33, 4)]  # External public servers
 
     #create an empty dictionary to store traceroute info
