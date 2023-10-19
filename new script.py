@@ -31,4 +31,4 @@ if __name__ == "__main__":
         traceroute_df.to_excel('traceroute_results.xlsx', index=False)  # pushes the collected dataframe info to an excel document named traceroute_xlsx
         print(f"Traceroute to {target_ip}: {result}")
 
-#Todo: use google dns, remove duplicate results, use multithreading(200 threads), split ranges per group member, write seperate program to merge all results
+#Todo: use google dns ips, remove duplicate excel results, use multithreading(200 threads), split ranges per group member, write seperate program to merge all results
