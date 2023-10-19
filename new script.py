@@ -18,8 +18,8 @@ def run_traceroute(target_ip):
     return hops
 
 if __name__ == "__main__":
-    target_ips = [f"10.{k+24}.{j}.{i}" for k in range(1, 255, 8) for j in range(1, 255, 8) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
-    target_ips2 = [f"138.238.{i}.{i}" for i in range(1, 33, 4)]  # External public servers
+    target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
+    target_ips2 = [f"138.238.{i}.{j}" for i in range(0, 256) for j in range(1, 255)]  # External public servers
 
     #create an empty dictionary to store traceroute info
     traceroute_data = []
