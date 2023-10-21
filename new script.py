@@ -48,8 +48,9 @@ def run_traceroutes(target_ips, num_threads=200):
     return traceroute_data
 
 if __name__ == "__main__":
-    target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
+    #target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
     target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 256) for i in range(1, 255)]  # External public servers
+    target_ips = [f"10.0.0.{i}" for i in range(1, 255, 8)]  # test range
 
 
     # traceroute dictionary variable
