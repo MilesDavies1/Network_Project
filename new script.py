@@ -59,6 +59,6 @@ if __name__ == "__main__":
     traceroute_df = pd.DataFrame(traceroute_data)
 
     # pushes the collected dataframe info to an excel document named traceroute_xlsx
-    traceroute_df.to_excel('traceroute_results10.xlsx', index=False)
+    traceroute_df.to_excel('traceroute_results.xlsx', index=False)
 
 # Suggestion: use google dns to search ips
