@@ -1,7 +1,10 @@
 Step 1:  
     Download the all the required modules   
+        pip install scapy
         pip install pandas (for dataframe)
         pip install openpyxl (for excel)
+        pip install tqdm 
+        pip install futures
 
 Step 2:  
     run the code
