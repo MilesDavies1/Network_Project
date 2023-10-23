@@ -1,0 +1,33 @@
+Step 1:  
+    Download the all the required modules   
+        pip install pandas (for dataframe)
+        pip install openpyxl (for excel)
+
+Step 2:  
+    run the code
+        *if no errors, the output should be a list of target ip's and traceroute results
+
+step 3: 
+    comment out line 68 (test range), and uncomment line 63 (actual ip range)
+
+step 4: 
+    enter your person_id on line 57 and run the code
+        *this should take a while
+
+step 5: 
+    the results should be copied to an excel file named "traceroute_results.xlsx"
+
+step 6: 
+    comment out line 52 and uncomment line 53
+
+step 7: 
+    change "target_ips" on line 71 to "target_ips2"
+
+step 8: 
+    change the file name on line 77 to "traceroute_results_2.xlsx"
+
+step 9: 
+    run the code
+
+step 10: 
+    the results should be copied to an excel file named "traceroute_results_2.xlsx"
