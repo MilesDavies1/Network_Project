@@ -59,13 +59,14 @@ if __name__ == "__main__":
     #total_iterations = 65020
     total_iterations = 500 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
+    iterations_per_location = iterations_per_person // 4
 
-    # Each person is assigned a unique ID (Brian(0), Morgan(1), aashish(2), Miles(3))
-    person_id = 0  # Change this value for each person
+    # Each location is assigned a unique ID (location(0), location(1), location(2), location(3))
+    location_id = 0  # Change this value for each person
 
     # Calculate the starting and ending indices for the loop
-    start_index = person_id * iterations_per_person
-    end_index = (person_id + 1) * iterations_per_person
+    start_index = location_id * iterations_per_location
+    end_index = (location_id + 1) * iterations_per_location
 
     #target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)][start_index:end_index]  # internal Campus routers, skipping every 8th IP
 
