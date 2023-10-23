@@ -53,7 +53,7 @@ if __name__ == "__main__":
     #total_iterations = 65020
     iterations_per_person = total_iterations // 4
 
-    # Assuming each person is assigned a unique ID (0, 1, 2, 3)
+    # Each person is assigned a unique ID (Brian(0), Morgan(1), aashish(2), Miles(3))
     person_id = 0  # Change this value for each person
 
     # Calculate the starting and ending indices for the loop
