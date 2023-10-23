@@ -31,3 +31,6 @@ step 9:
 
 step 10: 
     the results should be copied to an excel file named "traceroute_results_2.xlsx"
+
+step 11:
+    upload both excel flies to the GitHub
