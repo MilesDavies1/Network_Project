@@ -57,7 +57,7 @@ if __name__ == "__main__":
     # Assuming the total number of internal ip iterations is 2,097,152 and external ip iterations is 65,024
     total_iterations = 2097150
     #total_iterations = 65020
-    #total_iterations = 500 # ***TEST_ITERATIONS***
+    #total_iterations = 60000 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
     iterations_per_location = iterations_per_person // 4
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 1) for i in range(1, 255)][start_index:end_index]  # External public servers
 
     # ***TEST_RANGE*** (if code works, comment out this line and uncomment line 62)   
-    #target_ips = [f"10.0.0.{i}" for i in range(1, 255)][start_index:end_index]
+    #target_ips = [f"10.0.{j}.{i}" for j in range(0, 255) for i in range(1, 255)][start_index:end_index]
 
     # traceroute dictionary variable
     traceroute_data = run_traceroutes(target_ips)
