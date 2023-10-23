@@ -48,10 +48,24 @@ def run_traceroutes(target_ips, num_threads=200):
     return traceroute_data
 
 if __name__ == "__main__":
-    #target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 64) for j in range(0, 256) for i in range(1, 255, 8)]  # internal Campus routers, skipping every 8th IP
-    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 256) for i in range(1, 255)]  # External public servers
-    target_ips = [f"10.0.0.{i}" for i in range(1, 255, 8)]  # test range (if code works, delete this line and uncomment line 51)
+    # Assuming the total number of internal ip iterations is 2,097,152 and external ip iterations is 65,024
+    total_iterations = 2097150
+    #total_iterations = 65020
+    iterations_per_person = total_iterations // 4
 
+    # Assuming each person is assigned a unique ID (0, 1, 2, 3)
+    person_id = 0  # Change this value for each person
+
+    # Calculate the starting and ending indices for the loop
+    start_index = person_id * iterations_per_person
+    end_index = (person_id + 1) * iterations_per_person
+
+    #target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)][start_index:end_index]  # internal Campus routers, skipping every 8th IP
+
+    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 1) for i in range(1, 255)][start_index:end_index]  # External public servers
+
+    # ***TEST_RANGE*** (if code works, comment out this line and uncomment line 62)   
+    target_ips = [f"10.0.0.{i}" for i in range(1, 255)][start_index:end_index]
 
     # traceroute dictionary variable
     traceroute_data = run_traceroutes(target_ips)
