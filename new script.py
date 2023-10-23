@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from scapy.all import IP, UDP, sr1
 import pandas as pd
+from tqdm import tqdm
 import sys
 import os
 
@@ -27,16 +28,21 @@ def run_traceroute(target_ip):
 def run_traceroutes(target_ips, num_threads=200):
     traceroute_data = []
 
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = {executor.submit(run_traceroute, target_ip): target_ip for target_ip in target_ips}
+    # Use tqdm to create a progress bar for the loop
+    with tqdm(total=len(target_ips), desc="Tracerouting") as pbar:
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            futures = {executor.submit(run_traceroute, target_ip): target_ip for target_ip in target_ips}
 
-        for future in as_completed(futures):
-            target_ip = futures[future]
-            try:
-                result = future.result()
-                traceroute_data.append(result)
-            except Exception as e:
-                print(f"Error for {target_ip}: {str(e)}")
+            for future in as_completed(futures):
+                target_ip = futures[future]
+                try:
+                    result = future.result()
+                    traceroute_data.append(result)
+                except Exception as e:
+                    print(f"Error for {target_ip}: {str(e)}")
+
+                # Update the progress bar
+                pbar.update(1)
 
     # Sort the results based on the original order of target_ips
     traceroute_data.sort(key=lambda x: target_ips.index(x['Target IP']))
@@ -49,8 +55,9 @@ def run_traceroutes(target_ips, num_threads=200):
 
 if __name__ == "__main__":
     # Assuming the total number of internal ip iterations is 2,097,152 and external ip iterations is 65,024
-    total_iterations = 2097150
+    #total_iterations = 2097150
     #total_iterations = 65020
+    total_iterations = 500 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
 
     # Each person is assigned a unique ID (Brian(0), Morgan(1), aashish(2), Miles(3))
