@@ -75,5 +75,3 @@ if __name__ == "__main__":
 
     # pushes the collected dataframe info to an excel document named traceroute_xlsx
     traceroute_df.to_excel('traceroute_results.xlsx', index=False)
-
-# Suggestion: use google dns to search ips
