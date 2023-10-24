@@ -1,3 +1,3 @@
 Inital Traceroute Script.py : Sample Code
 New script.py.: Main Script
-traceroute.py : Additional Traceroute Script Different Approach
+traceroute.py : Extensive Traceroute Script that incorporates a progress bar
