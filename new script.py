@@ -57,12 +57,12 @@ if __name__ == "__main__":
     # Assuming the total number of internal ip iterations is 2,097,152 and external ip iterations is 65,024
     total_iterations = 2097150
     #total_iterations = 65020
-    #total_iterations = 60000 # ***TEST_ITERATIONS***
+    #total_iterations = 500 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
-    iterations_per_location = iterations_per_person // 4
+    iterations_per_location = iterations_per_person // 16
 
-    # Each location is assigned a unique number (Miles(0,1,2,3), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(14,15,16,17))
-    location_num = 0  # Change this value for each location visited
+    # Each location is assigned a unique number (Miles(0,1,2,3,4,5,6,7), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(14,15,16,17))
+    location_num = 14  # Change this value for each location visited
 
     # Calculate the starting and ending indices for the loop
     start_index = location_num * iterations_per_location
@@ -70,10 +70,10 @@ if __name__ == "__main__":
 
     target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)][start_index:end_index]  # internal Campus routers, skipping every 8th IP
 
-    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 256) for i in range(1, 255)][start_index:end_index]  # External public servers
+    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 256) for i in range(1, 255)]  # External public servers
 
     # ***TEST_RANGE*** (if code works, comment out this line and uncomment line 62)   
-    #target_ips = [f"10.0.{j}.{i}" for j in range(0, 255) for i in range(1, 255)][start_index:end_index]
+    #target_ips = [f"10.0.0.{i}" for i in range(1, 255)][start_index:end_index]
 
     # traceroute dictionary variable
     traceroute_data = run_traceroutes(target_ips)
@@ -82,5 +82,5 @@ if __name__ == "__main__":
     traceroute_df = pd.DataFrame(traceroute_data)
 
     # pushes the collected dataframe info to an excel document named traceroute_xlsx
-    traceroute_df.to_excel(f'traceroute_results_{location_num}.xlsx', index=False)
+    traceroute_df.to_excel(f'traceroute_results2_{location_num}.xlsx', index=False)
 
