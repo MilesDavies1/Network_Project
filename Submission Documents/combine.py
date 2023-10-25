@@ -19,5 +19,5 @@ def combine_excel_files(folder_path, output_file):
     print(f"Combined data saved to {output_file}")
 
 folder_path = r'C:\\Users\\Mmile\\OneDrive\\Desktop\\CS School Files\\traceroute' # folder with all the excel files
-output_file = 'combined_results.xlsx'
+output_file = 'combined_results2.xlsx'
 combine_excel_files(folder_path, output_file)
