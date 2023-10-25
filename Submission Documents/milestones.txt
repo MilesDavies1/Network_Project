@@ -13,3 +13,8 @@ Topology Fragment discovered
 	Library 10/21  Morgan Thornton @03004063
 	Physics Building 10/24   Morgan Thornton @03004063
 	Public 10/17 Morgan Thornton @03004063
+
+	Health Sciences Library 10/24 Brian Paul @02965840
+	Undergraduate Library 10/24 Brian Paul @02965840
+	Douglass Hall 10/24 Brian Paul @02965840
+	Academic Support Building B 10/24 Brian Paul @02965840
