@@ -1,0 +1,4 @@
+Inital Traceroute Script.py : Sample Code
+New script.py.: Main Script
+traceroute.py : Extensive Traceroute Script that incorporates a progress bar
+visualize.py : Visualze Findings
