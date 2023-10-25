@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from scapy.all import IP, UDP, sr1
 import pandas as pd
+from tqdm import tqdm
 import sys
 import os
 
@@ -27,16 +28,21 @@ def run_traceroute(target_ip):
 def run_traceroutes(target_ips, num_threads=200):
     traceroute_data = []
 
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = {executor.submit(run_traceroute, target_ip): target_ip for target_ip in target_ips}
+    # Use tqdm to create a progress bar for the loop
+    with tqdm(total=len(target_ips), desc="Tracerouting") as pbar:
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            futures = {executor.submit(run_traceroute, target_ip): target_ip for target_ip in target_ips}
 
-        for future in as_completed(futures):
-            target_ip = futures[future]
-            try:
-                result = future.result()
-                traceroute_data.append(result)
-            except Exception as e:
-                print(f"Error for {target_ip}: {str(e)}")
+            for future in as_completed(futures):
+                target_ip = futures[future]
+                try:
+                    result = future.result()
+                    traceroute_data.append(result)
+                except Exception as e:
+                    print(f"Error for {target_ip}: {str(e)}")
+
+                # Update the progress bar
+                pbar.update(1)
 
     # Sort the results based on the original order of target_ips
     traceroute_data.sort(key=lambda x: target_ips.index(x['Target IP']))
@@ -51,21 +57,23 @@ if __name__ == "__main__":
     # Assuming the total number of internal ip iterations is 2,097,152 and external ip iterations is 65,024
     total_iterations = 2097150
     #total_iterations = 65020
+    #total_iterations = 500 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
+    iterations_per_location = iterations_per_person // 16
 
-    # Each person is assigned a unique ID (Brian(0), Morgan(1), aashish(2), Miles(3))
-    person_id = 0  # Change this value for each person
+    # Each location is assigned a unique number (Miles(0,1,2,3,4,5,6,7), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(14,15,16,17))
+    location_num = 14  # Change this value for each location visited
 
     # Calculate the starting and ending indices for the loop
-    start_index = person_id * iterations_per_person
-    end_index = (person_id + 1) * iterations_per_person
+    start_index = location_num * iterations_per_location
+    end_index = (location_num + 1) * iterations_per_location
 
-    #target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)][start_index:end_index]  # internal Campus routers, skipping every 8th IP
+    target_ips = [f"10.{k}.{j}.{i}" for k in range(0, 256) for j in range(0, 256) for i in range(1, 255, 8)][start_index:end_index]  # internal Campus routers, skipping every 8th IP
 
-    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 1) for i in range(1, 255)][start_index:end_index]  # External public servers
+    target_ips2 = [f"138.238.{j}.{i}" for j in range(0, 256) for i in range(1, 255)]  # External public servers
 
     # ***TEST_RANGE*** (if code works, comment out this line and uncomment line 62)   
-    target_ips = [f"10.0.0.{i}" for i in range(1, 255)][start_index:end_index]
+    #target_ips = [f"10.0.0.{i}" for i in range(1, 255)][start_index:end_index]
 
     # traceroute dictionary variable
     traceroute_data = run_traceroutes(target_ips)
@@ -74,4 +82,5 @@ if __name__ == "__main__":
     traceroute_df = pd.DataFrame(traceroute_data)
 
     # pushes the collected dataframe info to an excel document named traceroute_xlsx
-    traceroute_df.to_excel('traceroute_results.xlsx', index=False)
+    traceroute_df.to_excel(f'traceroute_results2_{location_num}.xlsx', index=False)
+
