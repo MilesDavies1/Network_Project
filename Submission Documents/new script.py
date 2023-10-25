@@ -59,9 +59,9 @@ if __name__ == "__main__":
     #total_iterations = 65020
     #total_iterations = 500 # ***TEST_ITERATIONS***
     iterations_per_person = total_iterations // 4
-    iterations_per_location = iterations_per_person // 16
+    iterations_per_location = iterations_per_person // 4
 
-    # Each location is assigned a unique number (Miles(0,1,2,3,4,5,6,7), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(14,15,16,17))
+    # Each location is assigned a unique number (Miles(0,1,2,3), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(12,13,14,15))
     location_num = 14  # Change this value for each location visited
 
     # Calculate the starting and ending indices for the loop
@@ -82,5 +82,5 @@ if __name__ == "__main__":
     traceroute_df = pd.DataFrame(traceroute_data)
 
     # pushes the collected dataframe info to an excel document named traceroute_xlsx
-    traceroute_df.to_excel(f'traceroute_results2_{location_num}.xlsx', index=False)
+    traceroute_df.to_excel(f'traceroute_results_{location_num}.xlsx', index=False)
 
