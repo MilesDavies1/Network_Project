@@ -62,7 +62,7 @@ if __name__ == "__main__":
     iterations_per_location = iterations_per_person // 4
 
     # Each location is assigned a unique number (Miles(0,1,2,3), Brian(4,5,6,7), Aashish(8,9,10,11) Morgan(12,13,14,15))
-    location_num = 14  # Change this value for each location visited
+    location_num = 12  # Change this value for each location visited
 
     # Calculate the starting and ending indices for the loop
     start_index = location_num * iterations_per_location
