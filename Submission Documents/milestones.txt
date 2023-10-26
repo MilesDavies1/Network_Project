@@ -5,9 +5,10 @@ draw the diagram of the topology fragment, and provide the name and Howard ID of
 the discovery. Each topology fragment can only be attributed to one team member
 
 Programs Developed
-	traceroute.py 10/24
-	new script.py 10/04
-	combine.py 10/25
+	traceroute.py 10/24 Morgan Thornton
+	vizualize.py 10/24 Morgan Thornton
+	new script.py 10/24 Miles Davies
+	combine.py 10/25 Miles Davies
 	
 Topology Fragment discovered
 	Burr Gym 10/21	Morgan Thornton @03004063
