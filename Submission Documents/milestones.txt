@@ -23,3 +23,9 @@ Topology Fragment discovered
 	Bannekar Public Area 10/25 Aashish Adhikari @02986124
 	Mathematics Building 10/25 Aashish Adhikari @02986124
 	Mackey Building 10/25 Aashish Adhikari @02986124
+
+	Biology Building 10/23 Miles Davies @02921243
+	Health Sciences Library 10/23 Miles Davies @02965840
+	LKD 10/23 Miles Davies @02965840
+	Physics Building 10/24 Miles Davies @02921243
+	
