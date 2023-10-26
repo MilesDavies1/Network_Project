@@ -3,24 +3,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import argparse
 
-ip_path = 'total_ip.txt'
-link_path = 'total_link.txt'
-out_path = 'topology.jpg'
 node_color = 'lightgreen'
 
-with open(ip_path, 'r') as fp:
-	total_ip = [l.strip('\n') for l in fp]
-
-with open(link_path, 'r') as fp:
-	total_link = []
-
-	for l in fp:
-		e = l.strip('\n').split(',')
-		if e[0] == e[1]: continue
-
-		total_link.append((e[0], e[1]))
-
-def calc_links():
+def calc_links(output = False):
 	mmm = {}
 
 	for ip in total_ip:
@@ -28,38 +13,50 @@ def calc_links():
 
 	for s, e in total_link:
 		mmm[s].add(e)
-		mmm[e].add(e)
+		mmm[e].add(s)
 
-	cm = {}
+	if output:
+		cm = {}
 
-	for ip in total_ip:
-		c = len(mmm[ip])
-		if c not in cm.keys():
-			cm[c] = 1
-		else:
-			cm[c] += 1
+		for ip in total_ip:
+			c = len(mmm[ip])
+			if c not in cm.keys():
+				cm[c] = 1
+			else:
+				cm[c] += 1
 
-	print(cm)	
+		cc = []
+
+		for c, m in cm.items():
+			cc.append((c, m))
+
+		cc.sort()
+
+		with open('dist.csv', 'w') as fp:
+			for c, m in cc:
+				fp.write('{},{}\n'.format(c, m))
+
 	return mmm
 
-def draw_whole_topology():
+def draw_internal():
 	g = nx.Graph()
 
 	mmm = calc_links()
-	invalid_ips = [k for k in mmm.keys() if len(mmm[k]) < 2]
+	valid_ips = set([k for k in mmm.keys() if len(mmm[k]) >= 2 and k.startswith('10.')])
 
-	for ip in total_ip:
-		if ip in invalid_ips: continue
-		g.add_node(ip)
+	for ip in valid_ips:
+		conn = mmm[ip] & valid_ips
+		if len(conn) == 0: continue
 
-	for s, e in total_link:
-		if s in invalid_ips or e in invalid_ips: continue
-		g.add_edge(s, e)
+		for c in conn:
+			g.add_edge(ip, c)
+
+	print('drawing...')
 
 	fig = plt.figure(figsize = (200, 120))
 	nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
 
-	plt.savefig('vis_whole.jpg')
+	plt.savefig(worker_prefix + 'vis_internal.jpg')
 	plt.show()
 
 def draw_isolated():
@@ -82,100 +79,128 @@ def draw_isolated():
 	fig = plt.figure(figsize = (100, 60))
 	nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
 
-	plt.savefig('vis_isolated.jpg')
+	plt.savefig(worker_prefix + 'vis_isolated.jpg')
 	plt.show()
 
 def draw_public():
 	g = nx.Graph()
 
 	mmm = calc_links()
-	invalid_ips = [k for k in mmm.keys() if len(mmm[k]) < 2]
+	valid_ips = set([k for k in mmm.keys() if len(mmm[k]) >= 2 and k.startswith('138.238.')])
 
-	for ip in total_ip:
-		if ip.startswith('138.238.'):
-			if ip in invalid_ips: continue
-			g.add_node(ip)
+	for ip in valid_ips:
+		conn = mmm[ip] & valid_ips
+		if len(conn) == 0: continue
 
-	for s, e in total_link:
-		if s.startswith('138.238.') and e.startswith('138.238.'):
-			if s in invalid_ips or e in invalid_ips: continue
-			g.add_edge(s, e)
+		for c in conn:
+			g.add_edge(ip, c)
 
-	fig = plt.figure(figsize = (40, 24))
-	#nx.draw(g, pos = nx.circular_layout(g), node_color = node_color, edge_color = 'lightgray', with_labels = True)
-	#nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
-	nx.draw(g, pos = nx.planar_layout(g), node_color = node_color, edge_color = 'lightgray', with_labels = True)
+	print('drawing...')
 
-	plt.savefig('vis_public.jpg')
+	fig = plt.figure(figsize = (200, 120))
+	nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
+
+	plt.savefig(worker_prefix + 'vis_public.jpg')
 	plt.show()
 
 def draw_bridge():
 	g = nx.Graph()
 
 	mmm = calc_links()
-	invalid_ips = [k for k in mmm.keys() if len(mmm[k]) < 2]
+	valid_ips = set([k for k in mmm.keys() if len(mmm[k]) >= 4 and (k.startswith('138.238.') or k.startswith('10.'))])
 
-	for s, e in total_link:
-		if s.startswith('138.238.') and not e.startswith('138.238.'):
-			if s in invalid_ips or e in invalid_ips: continue
-			g.add_edge(s, e)
-		elif not s.startswith('138.238.') and e.startswith('138.238.'):
-			if s in invalid_ips or e in invalid_ips: continue
-			g.add_edge(s, e)
+	count = 0
 
-	fig = plt.figure(figsize = (90, 54))
-	nx.draw(g, pos = nx.random_layout(g), node_color = node_color, edge_color = 'lightgray', with_labels = True)
+	for ip in valid_ips:
+		conn = mmm[ip] & valid_ips		
 
-	plt.savefig('vis_bridge.jpg')
+		if ip.startswith('10.'):
+			prefix = '138.238.'
+		else:
+			prefix = '10.'
+
+		conn = [c for c in conn if c.startswith(prefix)]
+		if len(conn) == 0: continue
+
+		for c in conn:
+			count += 1
+			g.add_edge(ip, c)
+
+	print(count)
+	print('drawing...')
+
+	fig = plt.figure(figsize = (200, 120))
+	nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
+
+	plt.savefig(worker_prefix + 'vis_bridge.jpg')
 	plt.show()
 
 def draw_gates():
 	g = nx.Graph()
 
 	mmm = calc_links()
-	gate_ips = [k for k in mmm.keys() if len(mmm[k]) > 3]
-
-	# for ip in total_ip:
-	# 	link_count = 0
-
-	# 	for s, e in total_link:
-	# 		if s == ip or e == ip:
-	# 			link_count += 1
-	# 			if link_count > 1: break
-
-	# 	if link_count > 1:
-	# 		gate_ips.append(ip)
-	# 		g.add_node(ip)
+	gate_ips = [k for k in mmm.keys() if len(mmm[k]) >= 6]
 
 	for s, e in total_link:
 		if s in gate_ips and e in gate_ips:
 			g.add_edge(s, e)
 
-	fig = plt.figure(figsize = (30, 18))
-	nx.draw(g, pos = nx.random_layout(g), node_color = node_color, edge_color = 'lightgray', with_labels = True)
+	# fig = plt.figure(figsize = (30, 18))
+	# nx.draw(g, pos = nx.circular_layout(g), node_color = node_color, edge_color = 'lightgray', with_labels = True)
 
-	plt.savefig('vis_gate.jpg')
+	fig = plt.figure(figsize = (200, 120))
+	nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
+
+	#nx.draw(g, node_color = node_color, edge_color = 'lightgray', with_labels = True)
+
+	plt.savefig(worker_prefix + 'vis_gate.jpg')
 	plt.show()
 
 #def draw_
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
+	parser.add_argument('-w', '--worker', type = str, default = '', help = 'worker')
 	parser.add_argument('-m', '--mode', type = str, default = None, help = 'mode')
 	args = parser.parse_args()
 
-	if args.mode == 'whole':
-		draw_whole_topology()
+	global total_ip, total_link, worker_prefix
+
+	ip_path = 'total_ip.txt'
+	link_path = 'total_link.txt'
+
+	if args.worker != '':
+		worker_prefix = args.worker + '_'
+
+		ip_path = worker_prefix + ip_path
+		link_path = worker_prefix + link_path
+	else:
+		worker_prefix = ''
+
+	with open(ip_path, 'r') as fp:
+		total_ip = [l.strip('\n') for l in fp]
+
+	with open(link_path, 'r') as fp:
+		total_link = []
+
+		for l in fp:
+			e = l.strip('\n').split(',')
+			if e[0] == e[1]: continue
+
+			total_link.append((e[0], e[1]))
+
+	if args.mode == 'internal':
+		draw_internal()
 	elif args.mode == 'iso':
 		draw_isolated()
-	elif args.mode == 'pub':
+	elif args.mode == 'public':
 		draw_public()
 	elif args.mode == 'bridge':
 		draw_bridge()
 	elif args.mode == 'gate':
 		draw_gates()
 	elif args.mode == 'calc':
-		calc_links()
+		calc_links(True)
 	else:
 		print('invalid argument.')
 		exit(-1)
