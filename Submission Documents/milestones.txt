@@ -18,3 +18,8 @@ Topology Fragment discovered
 	Undergraduate Library 10/24 Brian Paul @02965840
 	Douglass Hall 10/24 Brian Paul @02965840
 	Academic Support Building B 10/24 Brian Paul @02965840
+
+	Chemistry Building 10/24 Aashish Adhikari @02986124
+	Bannekar Public Area 10/25 Aashish Adhikari @02986124
+	Mathematics Building 10/25 Aashish Adhikari @02986124
+	Mackey Building 10/25 Aashish Adhikari @02986124
