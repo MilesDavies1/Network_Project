@@ -3,3 +3,8 @@ contribution:
 Miles Davies @02921243 
 - developed script to search internal and external target ip addresses and save results to excel files
 - developed script to combine excel results into one excel sheet
+
+Morgan Thornton @03004063
+- developed script that scanned internal and external showing a progress bar with multi-threading
+- developed a script that visualize the ip
+- Analyzed and organized data for visualize
